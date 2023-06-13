@@ -1,6 +1,13 @@
 # OpenPifPaf ROS Wrapper (for Noetic)
 
-OpenPifPaf[Github](https://github.com/openpifpaf/openpifpaf)[arXiv](https://arxiv.org/abs/2103.02440) is a popular pose estimation network. It works robustly even in extreme lighting conditions [Our project based on OpenPifPaf](https://github.com/AutonomousVehicleLaboratory/anonymization).
+OpenPifPaf[Github](https://github.com/openpifpaf/openpifpaf)[arXiv](https://arxiv.org/abs/2103.02440) is a popular pose estimation network. It works robustly even in extreme lighting conditions [Our project based on OpenPifPaf](https://github.com/AutonomousVehicleLaboratory/anonymization). We provide a ros wrapper and a rosbag processing script for it.
+
+The rosbag processing script will generate a json file for each rosbag that has all the detection for each frame, example usage:
+```
+python3 src/ros_openpifpaf/src/rosbag_openpifpaf_human_detector.py /path/to/rosbag.bag --topic_list /camera/color/image_raw/compressed
+
+python3 src/ros_openpifpaf/src/rosbag_openpifpaf_human_detector.py /path/to/rosbag_dir --topic_list /camera/color/image_raw/compressed /oak/rgb/image_raw/compressed
+```
 
 ## Requirements
 
@@ -17,4 +24,4 @@ Output:
 3. /.../openpifpaf_image, Image message of visualizing the bounding box and keypoints.
 
 ## Note:
-We scale down the image by 0.5 to achieve real time performance. If we don't do this, current chosen model takes 300ms to process a full image. 
+We scale down the image by 0.5 to achieve real time performance. If we don't do this, current chosen model takes 300ms to process a full image (1920x1440). 
