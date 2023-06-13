@@ -2,12 +2,11 @@
 import rospy
 import cv2
 import numpy as np
-import time
 import openpifpaf
 from cv_bridge import CvBridge, CvBridgeError
-from ultralytics import YOLO
 from sensor_msgs.msg import Image, CompressedImage, JointState
 from vision_msgs.msg import Detection2DArray, Detection2D, ObjectHypothesisWithPose
+
 
 class CameraOpenPifPafNode():
     def __init__(self):
@@ -15,10 +14,9 @@ class CameraOpenPifPafNode():
         'mobilenetv2':
         'mobilenetv3large': 58.4    34ms    15.0 MB  # This model gives error
         'shufflenetv2k16':  68.1    40ms    38.9 MB
-        'shufflenetv2k30':  71.8    81ms    115.0 MB # no need to use this
+        'shufflenetv2k30':  71.8    81ms    115.0 MB # 
         """
-        self.model_name = 'mobilenetv3large'     # four times less GPU utilization
-        # self.model_name = 'shufflenetv2k30' # model we use for anonymization 
+        self.model_name = 'shufflenetv2k30' # model we use for anonymization 
         
         self.model = openpifpaf.Predictor(checkpoint=self.model_name)
         
