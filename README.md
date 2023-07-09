@@ -1,6 +1,6 @@
 # OpenPifPaf ROS Wrapper (for Noetic)
 
-OpenPifPaf[Github](https://github.com/openpifpaf/openpifpaf)[arXiv](https://arxiv.org/abs/2103.02440) is a popular pose estimation network. It works robustly even in extreme lighting conditions [Our project based on OpenPifPaf](https://github.com/AutonomousVehicleLaboratory/anonymization). We provide a ros wrapper and a rosbag processing script for it.
+OpenPifPaf \[[Github](https://github.com/openpifpaf/openpifpaf)\] \[[arXiv](https://arxiv.org/abs/2103.02440)\] is a popular pose estimation network. It works robustly even in extreme lighting conditions [Our project based on OpenPifPaf](https://github.com/AutonomousVehicleLaboratory/anonymization). We provide a ros wrapper and a rosbag processing script for it.
 
 The rosbag processing script will generate a json file for each rosbag that has all the detection for each frame, example usage:
 ```
