@@ -1,5 +1,5 @@
 """ Process a rosbag with thermal human detector and filter interesting data. """
-
+#!/usr/bin/env python3
 import os
 import rosbag
 import numpy as np
@@ -69,7 +69,7 @@ def cmdline_args():
         '--topic_list', 
         nargs="*",  # 0 or more values expected => creates a list
         type=str, 
-        default=['/camera/color/image_rect_color/compressed'], 
+        default=['/oak/rgb/image_raw/compressed'], 
         help='list of topics for openpifpaf human detection')
     p.add_argument(
         '--model_name',

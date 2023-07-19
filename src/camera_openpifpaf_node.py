@@ -32,20 +32,31 @@ class CameraOpenPifPafNode():
 
         # we have separate publisher and subscriber for each camera
         # that reuse the same callback funciton.
-        self.camera_list = [
-            "camera1", "camera2", "camera3", "camera4", "camera5", "camera6"
-        ]
+        # self.camera_list = [
+        #     "camera1", "camera2", "camera3", "camera4", "camera5", "camera6"
+        # ]
+
+        # self.sub_image, self.pub_detection, self.pub_pose = {}, {}, {}
+        # if self.output_image:
+        #     self.pub_image = {}
+        # for cam in self.camera_list:
+        #     self.sub_image[cam] = rospy.Subscriber("/avt_cameras/{}/image_color".format(cam), Image, self.image_callback, queue_size=1, callback_args="image_color")
+        #     self.sub_image[cam + '/compressed'] = rospy.Subscriber("/avt_cameras/{}/image_color/compressed".format(cam), CompressedImage, self.image_callback, queue_size=1, callback_args="compressed")
+        #     self.pub_detection[cam] = rospy.Publisher("/avt_cameras/{}/openpifpaf_detections".format(cam), Detection2DArray, queue_size=1)
+        #     self.pub_pose[cam] = rospy.Publisher("avt_cameras/{}/openpifpaf_pose".format(cam), JointState, queue_size=1)
+        #     if self.output_image:
+        #         self.pub_image[cam] = rospy.Publisher("/avt_cameras/{}/openpifpaf_image/compressed".format(cam), CompressedImage, queue_size=1)
+
 
         self.sub_image, self.pub_detection, self.pub_pose = {}, {}, {}
-        if self.output_image:
-            self.pub_image = {}
-        for cam in self.camera_list:
-            self.sub_image[cam] = rospy.Subscriber("/avt_cameras/{}/image_color".format(cam), Image, self.image_callback, queue_size=1, callback_args="image_color")
-            self.sub_image[cam + '/compressed'] = rospy.Subscriber("/avt_cameras/{}/image_color/compressed".format(cam), CompressedImage, self.image_callback, queue_size=1, callback_args="compressed")
-            self.pub_detection[cam] = rospy.Publisher("/avt_cameras/{}/openpifpaf_detections".format(cam), Detection2DArray, queue_size=1)
-            self.pub_pose[cam] = rospy.Publisher("avt_cameras/{}/openpifpaf_pose".format(cam), JointState, queue_size=1)
-            if self.output_image:
-                self.pub_image[cam] = rospy.Publisher("/avt_cameras/{}/openpifpaf_image/compressed".format(cam), CompressedImage, queue_size=1)
+        self.camera_list = ["/oak/rgb/image_raw/compressed"]
+        self.pub_image = {}
+        cam = "/oak/rgb/image_raw/compressed"
+        self.sub_image[cam] = rospy.Subscriber(cam, CompressedImage, self.image_callback, queue_size=1, callback_args="compressed")
+        #self.sub_image[cam + '/compressed'] = rospy.Subscriber("/avt_cameras/{}/image_color/compressed".format(cam), CompressedImage, self.image_callback, queue_size=1, callback_args="compressed")
+        self.pub_detection[cam] = rospy.Publisher(cam + "/openpifpaf_detections", Detection2DArray, queue_size=1)
+        self.pub_pose[cam] = rospy.Publisher(cam + "/openpifpaf_pose", JointState, queue_size=1)
+        self.pub_image[cam] = rospy.Publisher(cam + "/openpifpaf_image/compressed", CompressedImage, queue_size=1)
         
         self.bridge = CvBridge()
 
@@ -112,6 +123,14 @@ class CameraOpenPifPafNode():
                 h = h / self.image_scale
             x2 = x1 + w
             y2 = y1 + h
+
+            #print("shape of oakd image: ", image_in.shape) (720, 1280, 3)
+            # Don't take labels of people near boundaries of oakd fov
+            if x1 <= 75 or x1 >= 1000 or y2 <= 50:
+                #print("x1, y1, x2, y2: ", (x1, y1, x2, y2))
+                print("Skipping openpifpaf detection due to boundaries!")
+                continue
+
             det2d = Detection2D()
             det2d.bbox.center.x = (x1 + x2) / 2.0
             det2d.bbox.center.y = (y1 + y2) / 2.0
@@ -149,8 +168,9 @@ class CameraOpenPifPafNode():
                     if self.image_scale < 1:
                         keypoints[:,0:2] = keypoints[:,0:2] / self.image_scale
                     draw_skeleton(image_out, keypoints.reshape(-1))
-        # if self.output_image:
-        #     cv2.waitKey(1)
+        if self.output_image:
+            cv2.imshow("Output", image_out)
+            cv2.waitKey(1)
         # print('frame:', msg.header.frame_id)
         self.pub_detection[cam].publish(det2d_array)
         self.pub_pose[cam].publish(pose_msg)
